@@ -5,7 +5,7 @@ change log follows the conventions of
 
 ## [Unreleased]
 
-## 0.1.0 - 2016-12-07
+## 0.1.6-0 - 2016-12-07
 ### Added
 - Initial implementation, tracking Manifold 0.1.6
 
