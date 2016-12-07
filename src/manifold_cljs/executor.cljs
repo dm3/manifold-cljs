@@ -53,9 +53,14 @@
 (defn next-tick-executor [] next-tick-executor-instance)
 
 ;; different to Clj - use batched next-tick by default
-(def ^:private ^:mutable current-executor
-  ;; same as core.async
+;; there's no default executor in Clj - field is nil
+(def default-executor
+  ;; buffer size same as core.async
   (batched-executor next-tick-executor-instance 1024))
+
+;; for with-executor binding
+(def ^:private ^:mutable current-executor
+  default-executor)
 
 (defn executor []
   current-executor)

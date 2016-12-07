@@ -167,21 +167,23 @@
       (throw error)
       (throw (ex-info "" {:error error})))))
 
-(def ^:no-doc true-deferred-  (SuccessDeferred. true nil))
-(def ^:no-doc false-deferred- (SuccessDeferred. false nil))
-(def ^:no-doc nil-deferred-   (SuccessDeferred. nil nil))
+;; Manifold uses `nil` as the default executor.
+;; Manifold-cljs uses `ex/default-executor`, so we optimize for the relevant case.
+(def ^:no-doc true-deferred-  (SuccessDeferred. true ex/default-executor))
+(def ^:no-doc false-deferred- (SuccessDeferred. false ex/default-executor))
+(def ^:no-doc nil-deferred-   (SuccessDeferred. nil ex/default-executor))
 
 (defn success-deferred
   "A deferred which already contains a realized value"
   ([val]
      (success-deferred val (ex/executor)))
   ([val executor]
-     (if (nil? executor)
-       (condp keyword-identical? val
+     (if (identical? executor ex/default-executor)
+       (condp = val
          true true-deferred-
          false false-deferred-
          nil nil-deferred-
-         (SuccessDeferred. val nil))
+         (SuccessDeferred. val executor))
        (SuccessDeferred. val executor))))
 
 (defn error-deferred

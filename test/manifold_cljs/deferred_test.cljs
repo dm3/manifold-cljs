@@ -1,7 +1,8 @@
 (ns manifold-cljs.deferred-test
   (:require [manifold-cljs.deferred :as d]
+            [manifold-cljs.executor :as e]
             [manifold-cljs.test-util :refer [later capture-success capture-error]]
-            [cljs.test :refer [deftest testing is async]]))
+            [cljs.test :refer [deftest testing is are async]]))
 
 (deftest test-deferred-success
   (async done
@@ -25,6 +26,36 @@
         (later
           (is (= ex @callback-result))
           (done))))))
+
+(deftest test-success-deferred-default
+  (testing "with a default executor"
+
+    (let [d1 (d/success-deferred :value)
+          d2 (d/success-deferred :value)]
+      (is (= (e/executor) (.-executor d1) (.-executor d2)))
+      (is (not (identical? d1 d2)))
+
+      (testing ", true/false/nil with the default executor are cached"
+        (are [x] (identical? (d/success-deferred x) (d/success-deferred x))
+             true
+             false
+             nil))))
+
+  (testing "with a custom executor"
+    (let [e (e/sync-executor)]
+      (e/with-executor e
+
+        (testing ", true/false/nil not cached"
+          (are [x] (not (identical? (d/success-deferred x)
+                                    (d/success-deferred x)))
+               true
+               false
+               nil))
+
+        (testing ", executor is propagated"
+          (is (= e
+                 (.-executor (d/success-deferred :value))
+                 (.-executor (d/success-deferred true)))))))))
 
 (deftest test-chain
   (async done
