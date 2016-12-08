@@ -36,7 +36,7 @@ You can find several examples in the `examples/` directory.
 
 ## Extensions
 
-* [Core.Async](https://github.com/clojure/core.async) adapter at [Manifold-cljs.Core.Async](https://github.com/dm3/manifold-cljs).
+* [Core.Async](https://github.com/clojure/core.async) adapter at [Manifold-cljs.Core.Async](https://github.com/dm3/manifold-cljs.core.async).
 
 ## Differences to Clojure implementation
 
