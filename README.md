@@ -139,6 +139,8 @@ Ideally we should propagate this change to the Clojure Manifold.
 * performance - currently ~3x slower than core.async on the `daisy` example
 * `deferred/let-flow` - needs a different deep code walking impl/riddley replacement for Cljs
 
+See [Closure Promise](https://github.com/google/closure-library/blob/master/closure/goog/promise/promise.js#L84) for more ideas.
+
 ## Patterns and Gotchas
 
 Manifold is in need of best practices/patterns/gotchas library.
