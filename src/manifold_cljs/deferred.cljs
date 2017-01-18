@@ -322,9 +322,10 @@
 (defn catch'
   "Like `catch`, but does not coerce deferrable values."
   ([x error-handler]
-     (catch' x js/Error error-handler))
+     (catch' x nil error-handler))
   ([x error-class error-handler]
-   (let [x (chain' x)]
+   (let [x (chain' x)
+         error? #(or (nil? error-class) (instance? error-class %))]
      (if-not (deferred? x)
 
        ;; not a deferred value, skip over it
@@ -334,7 +335,7 @@
          val x
 
          err (try
-               (if (instance? error-class err)
+               (if (error? %)
                  (chain' (error-handler err))
                  (error-deferred err))
                (catch js/Error e
@@ -345,7 +346,7 @@
            (on-realized x
                         #(success! d' %)
                         #(try
-                           (if (instance? error-class %)
+                           (if (error? %)
                              (chain'- d' (error-handler %))
                              (chain'- d' (error-deferred %)))
                            (catch js/Error e
@@ -367,7 +368,7 @@
 
     "
   ([x error-handler]
-    (catch x js/Error error-handler))
+    (catch x nil error-handler))
   ([x error-class error-handler]
      (if-let [d (->deferred x nil)]
        (-> d

@@ -58,17 +58,11 @@
                  (.-executor (d/success-deferred true)))))))))
 
 (deftest test-chain
-  (async done
-         (is (= 0 @(d/chain 0)))
-         (done))
+  (is (= 0 @(d/chain 0)))
 
-  (async done
-         (is (= 1 @(d/chain 0 inc)))
-         (done))
+  (is (= 1 @(d/chain 0 inc)))
 
-  (async done
-         (is (= 1 @(d/chain 0 (constantly 1))))
-         (done)))
+  (is (= 1 @(d/chain 0 (constantly 1)))))
 
 (deftest test-catch
   (async done
@@ -81,6 +75,13 @@
   (async done
          (let [d (-> 0
                      (d/chain #(throw (js/Error. "boom")))
+                     (d/catch (constantly :foo)))]
+           (later (is (= :foo @d))
+                  (done)))))
+
+(deftest test-catch-non-error
+  (async done
+         (let [d (-> (d/error-deferred :bar)
                      (d/catch (constantly :foo)))]
            (later (is (= :foo @d))
                   (done)))))
@@ -100,9 +101,8 @@
               (later (is (= i @a @b))))))))
     (done)))
 
-(deftest test-callbacks
-  (testing "listener on success"
-    (async done
+(deftest test-callbacks-success
+  (async done
            (let [d (d/deferred)
                  result (atom nil)
                  f #(reset! result %)
@@ -113,60 +113,60 @@
                (is (= ::done @result))
                (done)))))
 
-  (testing "listener on error"
-    (async done
-           (let [d (d/deferred)
-                 result (atom nil)
-                 f #(reset! result %)
-                 l (d/listener f f)]
-             (d/add-listener! d l)
-             (d/error! d ::error)
-             (later
-               (is (= ::error @result))
-               (done)))))
+(deftest test-callbacks-error
+  (async done
+         (let [d (d/deferred)
+               result (atom nil)
+               f #(reset! result %)
+               l (d/listener f f)]
+           (d/add-listener! d l)
+           (d/error! d ::error)
+           (later
+             (is (= ::error @result))
+             (done)))))
 
-  (testing "removes listener"
-    (async done
-           (let [d (d/deferred)
-                 result (atom nil)
-                 f #(reset! result %)
-                 l (d/listener f f)]
-             (d/add-listener! d l)
-             (d/cancel-listener! d l)
-             (d/success! d ::done)
-             (later
-               (is (nil? @result))
-               (done)))))
+(deftest test-callbacks-remove-listener
+  (async done
+         (let [d (d/deferred)
+               result (atom nil)
+               f #(reset! result %)
+               l (d/listener f f)]
+           (d/add-listener! d l)
+           (d/cancel-listener! d l)
+           (d/success! d ::done)
+           (later
+             (is (nil? @result))
+             (done)))))
 
-  (testing "executes listeners in order"
-    (async done
-           (let [d (d/deferred)
-                 result (atom [])
-                 f (fn [v] (fn [_] (swap! result conj v)))
-                 l1 (d/listener (f 1) (f 1))
-                 l2 (d/listener (f 2) (f 2))]
-             (d/add-listener! d l1)
-             (d/add-listener! d l2)
-             (d/success! d ::done)
-             (later
-               (is (= [1 2] @result))
-               (done)))))
+(deftest test-callbacks-removes-identical-listeners
+  (async done
+         (let [d (d/deferred)
+               result (atom [])
+               f (fn [v] (fn [_] (swap! result conj v)))
+               l1 (d/listener (f 1) (f 1))
+               l2 (d/listener (f 2) (f 2))]
+           (d/add-listener! d l1)
+           (d/add-listener! d l2)
+           (d/add-listener! d l1)
+           (d/cancel-listener! d l1)
+           (d/success! d ::done)
+           (later
+             (is (= [2] @result))
+             (done)))))
 
-  (testing "removes all identical listeners"
-    (async done
-           (let [d (d/deferred)
-                 result (atom [])
-                 f (fn [v] (fn [_] (swap! result conj v)))
-                 l1 (d/listener (f 1) (f 1))
-                 l2 (d/listener (f 2) (f 2))]
-             (d/add-listener! d l1)
-             (d/add-listener! d l2)
-             (d/add-listener! d l1)
-             (d/cancel-listener! d l1)
-             (d/success! d ::done)
-             (later
-               (is (= [2] @result))
-               (done))))))
+(deftest test-callbacks-executes-listeners-in-order
+  (async done
+         (let [d (d/deferred)
+               result (atom [])
+               f (fn [v] (fn [_] (swap! result conj v)))
+               l1 (d/listener (f 1) (f 1))
+               l2 (d/listener (f 2) (f 2))]
+           (d/add-listener! d l1)
+           (d/add-listener! d l2)
+           (d/success! d ::done)
+           (later
+             (is (= [1 2] @result))
+             (done)))))
 
 (deftest test-alt
   (is (#{1 2 3} @(d/alt 1 2 3)))
