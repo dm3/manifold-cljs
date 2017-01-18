@@ -193,10 +193,7 @@
                (is (true? @consume-result))
                (done))))))
 
-;; TODO: bug in Manifold proper
-;; https://github.com/ztellman/manifold/pull/111
-#_(deftest test-async-consume
-  (println "test async consume")
+(deftest test-async-consume
   (async done
          (let [a (s/stream)
                result (atom [])
