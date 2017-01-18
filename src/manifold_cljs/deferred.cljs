@@ -377,32 +377,37 @@
          chain)
        x)))
 
-;; - instance? IDeferred -> deferred?
 ;; - Throwable -> js/Error
 (defn finally'
   "Like `finally`, but doesn't coerce deferrable values."
   [x f]
-  (if (deferred? x)
-    (if (realized? x)
-      (try
-        (f)
-        x
-        (catch js/Error e
-          (error-deferred e)))
-      (-> x
-          (chain'
-           (fn [x']
-             (f)
-             x'))
-          (catch'
-              (fn [e]
-                (f)
-                (throw e)))))
-    (try
-      (f)
-      x
-      (catch js/Error e
-        (error-deferred e)))))
+  (success-error-unrealized x
+
+     val (try
+           (f)
+           x
+           (catch js/Error e
+             (error-deferred e)))
+
+     err (try
+           (f)
+           (error-deferred err)
+           (catch js/Error e
+             (error-deferred e)))
+
+     (let [d (deferred)]
+       (on-realized x
+         #(try
+            (f)
+            (success! d %)
+            (catch js/Error e
+              (error! d e)))
+         #(try
+            (f)
+            (error! d %)
+            (catch js/Error e
+              (error! d e))))
+       d)))
 
 ;; same
 (defn finally
