@@ -128,7 +128,7 @@ Ideally we should propagate this change to the Clojure Manifold.
 ### Cljs-only functions
 
 * `manifold-cljs.deferred`
-    - `alt` - see [Manifold alt issue](https://github.com/ztellman/manifold/pull/102)
+    - `time` - measure time taken to evaluate the body in a deferred
 
 ## TODO
 
