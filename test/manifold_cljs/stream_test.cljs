@@ -367,6 +367,21 @@
              (is (= 3 @r))
              (done)))))
 
+(deftest test-reduce-reduced
+  (async done
+         (let [inputs (range 10)
+               accf (fn [acc el]
+                      (if (= el 5) (reduced :large) el))
+               s (s/->source inputs)
+               result (s/reduce accf 0 s)]
+           (later
+             (is (= :large (reduce accf 0 inputs) @result))
+             (is (not (s/drained? s)))
+             (let [t (s/try-take! s 1)]
+               (later
+                 (is (= 6 @t))
+                 (done)))))))
+
 (deftest test-mapcat
   (async done
          (let [s (s/stream)
