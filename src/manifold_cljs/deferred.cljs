@@ -335,7 +335,7 @@
          val x
 
          err (try
-               (if (catch? %)
+               (if (catch? err)
                  (chain' (error-handler err))
                  (error-deferred err))
                (catch js/Error e
