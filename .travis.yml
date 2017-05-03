@@ -5,7 +5,7 @@ install:
   - mkdir -p ~/bin
   - export PATH=~/bin:$PATH
   # Could use `latest` tag instead of version number
-  - curl -L https://github.com/boot-clj/boot-bin/releases/download/2.5.2/boot.sh -o ~/bin/boot
+  - curl -L https://github.com/boot-clj/boot-bin/releases/download/2.7.1/boot.sh -o ~/bin/boot
   - chmod +x ~/bin/boot
 env:
   matrix:
