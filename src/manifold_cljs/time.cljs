@@ -1,5 +1,5 @@
 (ns manifold-cljs.time
-  (:require [manifold-cljs.deferred.default :as d]
+  (:require [manifold-cljs.deferred.default-impl :as d]
             [manifold-cljs.executor :as ex]
             [manifold-cljs.deferred.core :as core]))
 

@@ -1,5 +1,5 @@
 (def project 'manifold-cljs)
-(def version "0.1.6-0")
+(def version "0.1.6-1")
 
 (set-env! :resource-paths #{"src" "vendor"}
           :dependencies   '[[org.clojure/clojure "1.8.0" :scope "provided"]

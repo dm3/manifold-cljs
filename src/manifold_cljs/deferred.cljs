@@ -1,6 +1,6 @@
 (ns manifold-cljs.deferred
   (:refer-clojure :exclude [realized?])
-  (:require [manifold-cljs.deferred.default :as d]
+  (:require [manifold-cljs.deferred.default-impl :as d]
             [manifold-cljs.deferred.core :as core]
             [manifold-cljs.executor :as ex]
             [manifold-cljs.time :as time])

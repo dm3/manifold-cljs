@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [map filter repeatedly reductions reduce mapcat concat])
   (:require [clojure.core :as clj]
             [manifold-cljs.stream.core :as core]
-            [manifold-cljs.stream.default :as default]
+            [manifold-cljs.stream.default-impl :as default]
             [manifold-cljs.stream.graph :as g]
             [manifold-cljs.time :as time]
             [manifold-cljs.utils :as u]

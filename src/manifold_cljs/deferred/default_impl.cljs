@@ -1,10 +1,10 @@
-(ns manifold-cljs.deferred.default
+(ns manifold-cljs.deferred.default-impl
   (:require [manifold-cljs.executor :as ex]
             [manifold-cljs.impl.list :as l]
             [manifold-cljs.impl.queue :as q]
             [manifold-cljs.impl.logging :as log]
             [manifold-cljs.deferred.core :as core])
-  (:require-macros [manifold-cljs.deferred.default :refer [set-deferred deref-deferred]]))
+  (:require-macros [manifold-cljs.deferred.default-impl :refer [set-deferred deref-deferred]]))
 
 (deftype Deferred
   [^:mutable val

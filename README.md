@@ -91,7 +91,7 @@ or `IWithMeta` implementations for streams/deferreds.
 
 The protocols for the Deferred have been moved to
 `manifold-cljs.deferred.core`. The default implementation - to
-`manifold-cljs.deferred.default`. This is analogous to what has been done to
+`manifold-cljs.deferred.default-impl`. This is analogous to what has been done to
 streams.  This was done in order to avoid a cyclic dependency between
 `manifold-cljs.deferred`, where the protocols used to live, and
 `manifold-cljs.time`. Clojurescript is compiled statically and can't `require`

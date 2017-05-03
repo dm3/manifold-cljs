@@ -1,4 +1,4 @@
-(ns manifold-cljs.stream.default
+(ns manifold-cljs.stream.default-impl
   (:require [manifold-cljs.deferred :as d]
             [manifold-cljs.impl.queue :as q]
             [manifold-cljs.impl.logging :as log]

@@ -1,4 +1,4 @@
-(ns manifold-cljs.deferred.default
+(ns manifold-cljs.deferred.default-impl
   (:require [manifold-cljs.utils :refer [kw-identical?]]))
 
 ;; Throwable -> js/Error
