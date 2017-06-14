@@ -64,14 +64,15 @@
 
   (is (= 1 @(d/chain 0 (constantly 1)))))
 
-(deftest test-catch
+(deftest test-catch-no-catch
   (async done
          (let [d (-> 0
                      (d/chain #(throw (js/Error. "boom")))
                      (d/catch js/Number (constantly :foo)))]
            (later (is (thrown-with-msg? js/Error #"boom" @d))
-                  (done))))
+                  (done)))))
 
+(deftest test-catch
   (async done
          (let [d (-> 0
                      (d/chain #(throw (js/Error. "boom")))
@@ -168,31 +169,29 @@
              (is (= [1 2] @result))
              (done)))))
 
-(deftest test-alt
-  (is (#{1 2 3} @(d/alt 1 2 3)))
-
-  (testing "deferred result"
-    (try (async done
-           (try (let [d (d/alt (d/future 1) 2)]
-             (println ">>>>>>" d)
-             (later (println "!!!!!" d) (is (= 3 @d))
-                    (done)))
-                (catch js/Error e
-                  (println "!!!!!!" e)
-                  (done))))
-         (catch js/Error e
-           (println "???" e))))
-
+(deftest test-alt-timeout
   (async done
          (let [d (d/alt (d/timeout! (d/deferred) 10) 2)]
-           (later (is (= 3 @d))
-                  (done))))
+           (later (is (= 2 @d))
+                  (done)))))
 
+(deftest test-alt-deferred
+  (async done
+           (try (let [d (d/alt (d/future 1) 2)]
+             (later (is (= 2 @d))
+                    (done)))
+                (catch js/Error e
+                  (done)))))
+
+(deftest test-alt-error
   (async done
          (let [d (d/alt (d/error-deferred (js/Error. "boom"))
                         (d/timeout! (d/deferred) 10 1))]
            (is (thrown-with-msg? js/Error #"boom" @d)
-               (done))))
+               (done)))))
+
+(deftest test-alt
+  (is (#{1 2 3} @(d/alt 1 2 3)))
 
   (testing "uniformly distributed"
     (let [results (atom {})
@@ -205,17 +204,16 @@
       (doseq [[i times] @results]
         (is (<= (f -) times (f +)))))))
 
-(deftest test-loop
-  ;; body produces a non-deferred value
+(deftest test-loop-non-deferred
   (async done
          (let [result (capture-success
                         (d/loop [] true))]
            (later
              (is (true? @result))
-             (done))))
+             (done)))))
 
+(deftest test-loop-deferred
   (async done
-         ;; body raises exception
          (let [ex (js/Error.)
                result (capture-error
                         (d/loop [] (throw ex)))]

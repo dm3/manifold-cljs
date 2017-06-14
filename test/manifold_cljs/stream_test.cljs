@@ -83,48 +83,40 @@
       (is (no-success? (s/put! s 2)))
 
       (is (= 1 @(s/take! s)))
-      (is (= 2 @(s/take! s)))))
+      (is (= 2 @(s/take! s))))))
 
-  (testing "xform"
-    (async done
-           (let [s (s/stream 0 (mapcat #(vector % % %)))]
-             (s/put! s 1)
-             (let [t1 (s/take! s), t2 (s/take! s)]
-               (later
-                 (is (= 1 @t1))
-                 (is (= 1 @t2))
-                 (done)))))))
-
-(deftest test-default-operations
+(deftest test-stream-xform
   (async done
-         (testing "put-all!"
-           (let [s (s/stream)
-                 p (s/put-all! s [1 2])
-                 t1 (s/take! s), t2 (s/take! s)]
-             (is (= 1 @t1))
-             (is (no-success? t2))
+         (let [s (s/stream 0 (mapcat #(vector % % %)))]
+           (s/put! s 1)
+           (let [t1 (s/take! s), t2 (s/take! s)]
              (later
-               (is (= 2 @t2))
-               (done)))))
+               (is (= 1 @t1))
+               (is (= 1 @t2))
+               (done))))))
 
-  (testing "try-take!"
-    (async done
-      (let [s (s/stream)
-            t1 (s/try-take! s ::none 500 ::timeout)]
-        (t/in 600
-              (fn []
-                (do
-                  (is (= ::timeout @t1))
-                  (done))))))))
+(deftest test-put-all
+  (async done
+         (let [s (s/stream)
+               p (s/put-all! s [1 2])
+               t1 (s/take! s), t2 (s/take! s)]
+           (is (= 1 @t1))
+           (is (no-success? t2))
+           (later
+             (is (= 2 @t2))
+             (done)))))
 
-(deftest test-async-connect
-  (testing "existing puts/take propagate synchronously after connect"
-    (let [a (s/stream), b (s/stream)
-          p (s/put! a 1), t (s/take! b 1)]
-      (s/connect a b)
-      (is (true? @p))
-      (is (= 1 @t))))
+(deftest test-try-take
+  (async done
+         (let [s (s/stream)
+               t1 (s/try-take! s ::none 500 ::timeout)]
+           (t/in 600
+                 (fn []
+                   (do
+                     (is (= ::timeout @t1))
+                     (done)))))))
 
+(deftest test-async-propagate
   (testing "new takes propagate asynchronously"
     (async done
            (let [a (s/stream), b (s/stream)]
@@ -134,8 +126,9 @@
                (is (no-success? t))
                (later
                  (is (= 1 @t))
-                 (done))))))
+                 (done)))))))
 
+(deftest test-propagate-buffered
   (testing "propagates with buffered streams"
     (async done
            (let [a (s/stream 1), b (s/stream 1)]
@@ -146,8 +139,9 @@
                (later
                  (is (= 1 @t1))
                  (is (= 2 @t2))
-                 (done))))))
+                 (done)))))))
 
+(deftest test-close-downstream
   (testing "closes all downstreams when single upstream closed"
     (async done
            (let [a (s/stream), b (s/stream), c (s/stream)]
@@ -165,8 +159,9 @@
              (later
                (is (s/closed? b))
                (is (s/closed? c))
-               (done)))))
+               (done))))))
 
+(deftest test-not-close-downstream
   (testing "doesn't close downstream when connected with downstream? = false"
     (async done
            (let [a (s/stream), b (s/stream)]
@@ -176,6 +171,14 @@
              (later
                (is (not (s/closed? b)))
                (done))))))
+
+(deftest test-existing-propagate
+  (testing "existing puts/take propagate synchronously after connect"
+    (let [a (s/stream), b (s/stream)
+          p (s/put! a 1), t (s/take! b 1)]
+      (s/connect a b)
+      (is (true? @p))
+      (is (= 1 @t)))))
 
 (deftest test-consume
   (async done
@@ -257,23 +260,26 @@
                  (is (not (s/closed? dst)))
                  (done)))))))
 
-(deftest test-periodically
-  (async done
-         (let [result (atom 0)
-               period 50, init-delay 25
-               s (s/periodically init-delay period #(swap! result inc))]
-           (t/in (+ (+ init-delay (* 2 period)) 10)
-                 #(do (is (= @result 3))
-                      (done)))))
-
+(deftest test-periodically-initial-delay
   (testing "initial delay set below period when not provided explicitly"
     (async done
            (let [result (atom 0)
                  period 50
                  s (s/periodically period #(swap! result inc))]
+             (s/consume identity s)
              (t/in period
                    #(do (is (= @result 1))
                         (done)))))))
+
+(deftest test-periodically
+  (async done
+         (let [result (atom 0)
+               period 50, init-delay 25
+               s (s/periodically init-delay period #(swap! result inc))]
+             (s/consume identity s)
+           (t/in (+ init-delay (* 2 period))
+                 #(do (is (= @result 3))
+                      (done))))))
 
 (deftest test-transform
   (async done
