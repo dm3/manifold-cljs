@@ -46,11 +46,16 @@
   (dev!)
   (test-cljs :js-env (or js-env :phantom)))
 
-(deftask autotest []
+(deftask autotest [j js-env VAL kw "JS environment (node/phantomjs/karma/...)"]
   (merge-env! :resource-paths #{"test"})
   (dev!)
   (comp (watch)
-        (test-cljs)))
+        (test-cljs :js-env (or js-env :phantom))))
+
+(deftask repl-dev []
+  (merge-env! :resource-paths #{"test"})
+  (dev!)
+  (repl))
 
 ;; examples
 (require '[pandeiro.boot-http :as http]

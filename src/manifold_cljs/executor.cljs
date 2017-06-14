@@ -18,9 +18,13 @@
       (js/setTimeout f timeout-ms))))
 
 (def ^:private next-tick-executor-instance
-  (reify Executor
-    (execute [_ f]
-      (goog.async.nextTick f))))
+  (if (exists? js/process)
+    (reify Executor
+      (execute [_ f]
+        (.nextTick js/process f)))
+    (reify Executor
+      (execute [_ f]
+        (goog.async.nextTick f)))))
 
 (declare ^:private process-batched)
 
