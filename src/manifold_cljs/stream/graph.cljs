@@ -47,27 +47,26 @@
   (let [sink (.-sink d)]
     (let [x (if (== (.-timeout d) -1)
               (s/put sink msg false)
-              (s/put sink msg false (.-timeout d) (when (.-downstream? d) d)))]
+              (s/put sink msg false (.-timeout d) (if (.-downstream? d) sink false)))]
       (AsyncPut. x dsts d (.-upstream? d)))))
 
 ;; (.x) -> (.-x)
 ;; CHM#remove -> WeakMap.delete
 ;; COWAList.remove, size -> list/remove,size
+;; instance? -> satisfies?
 (defn- handle-async-put [^AsyncPut x val source]
-  (let [d (.-deferred x)]
-    (cond
-      (true? val)
-      nil
-
-      (false? val)
+  (let [d (.-deferred x)
+        val (if (satisfies? s/IEventSink val)
+              (do
+                (s/close! val)
+                false)
+              val)]
+    (when (false? val)
       (let [l (.-dsts x)]
         (l/remove l (.-dst x))
         (when (or (.-upstream? x) (== 0 (l/size l)))
           (s/close! source)
-          (.delete handle->downstreams (s/weak-handle source))))
-
-      (satisfies? s/IEventSink val)
-      (s/close! val))))
+          (.delete handle->downstreams (s/weak-handle source)))))))
 
 ;; (.x) -> (.-x)
 ;; CHM#remove -> WeakMap.delete

@@ -496,3 +496,17 @@
                          (fn []
                            (is (s/drained? r))
                            (done))))))))))))
+
+(deftest test-connect-timeout
+  (async done
+    (let [src  (s/stream)
+          sink (s/stream)]
+
+      (s/connect src sink {:timeout 10})
+      (s/put-all! src (range 10))
+
+      (t/in 100
+            (fn []
+              (is (s/closed? sink))
+              (is (s/closed? src))
+              (done))))))
