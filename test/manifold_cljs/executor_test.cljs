@@ -15,7 +15,7 @@
                (fn []
                  (is (= ::done @a))
                  (done))
-               50)))))
+               80)))))
 
 (deftest test-executor-next-tick
   (async done
