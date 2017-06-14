@@ -3,7 +3,7 @@
 
 (set-env! :resource-paths #{"src" "vendor"}
           :dependencies   '[[org.clojure/clojure "1.8.0" :scope "provided"]
-                            [org.clojure/clojurescript "1.9.521" :scope "provided"]
+                            [org.clojure/clojurescript "1.9.562" :scope "provided"]
                             [adzerk/boot-cljs "2.0.0" :scope "test"
                              :exclusions [org.clojure/clojurescript]]
                             [adzerk/boot-test "1.1.2" :scope "test"]
@@ -41,10 +41,10 @@
   (comp (watch)
         (cljs)))
 
-(deftask test []
+(deftask test [j js-env VAL kw "JS environment (node/phantomjs/karma/...)"]
   (merge-env! :resource-paths #{"test"})
   (dev!)
-  (test-cljs))
+  (test-cljs :js-env (or js-env :phantom)))
 
 (deftask autotest []
   (merge-env! :resource-paths #{"test"})
