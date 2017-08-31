@@ -19,7 +19,7 @@
   ([result]
     (capture-error result true))
   ([result expected-return-value]
-    (let [a (atom)]
+    (let [a (atom nil)]
       (d/on-realized result
         #(println "Expected error, got success:" % "!")
         #(do (reset! a %) expected-return-value))
