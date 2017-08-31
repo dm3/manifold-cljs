@@ -46,6 +46,11 @@
   (dev!)
   (test-cljs :js-env (or js-env :phantom)))
 
+(deftask test-all []
+  (comp
+    (test :js-env :phantom)
+    (test :js-env :node)))
+
 (deftask autotest [j js-env VAL kw "JS environment (node/phantomjs/karma/...)"]
   (merge-env! :resource-paths #{"test"})
   (dev!)
