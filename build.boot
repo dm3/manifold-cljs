@@ -3,7 +3,7 @@
 
 (set-env! :resource-paths #{"src" "vendor"}
           :dependencies   '[[org.clojure/clojure "1.8.0" :scope "provided"]
-                            [org.clojure/clojurescript "1.9.562" :scope "provided"]
+                            [org.clojure/clojurescript "1.9.908" :scope "provided"]
                             [adzerk/boot-cljs "2.0.0" :scope "test"
                              :exclusions [org.clojure/clojurescript]]
                             [adzerk/boot-test "1.1.2" :scope "test"]
@@ -13,17 +13,18 @@
                             [adzerk/boot-reload "0.5.1" :scope "test"]
                             [pandeiro/boot-http "0.7.3" :scope "test"]])
 
-(task-options!
- pom {:project     project
-      :version     version
-      :description "Manifold implementation in Clojurescript"
-      :url         "https://github.com/dm3/manifold-cljs"
-      :scm         {:url "https://github.com/dm3/manifold-cljs"}
-      :license     {"MIT License" "https://opensource.org/licenses/MIT"}})
-
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[adzerk.bootlaces :as l :refer [push-release]]
          '[crisptrutski.boot-cljs-test :refer [test-cljs]])
+
+(task-options!
+ pom       {:project     project
+            :version     version
+            :description "Manifold implementation in Clojurescript"
+            :url         "https://github.com/dm3/manifold-cljs"
+            :scm         {:url "https://github.com/dm3/manifold-cljs"}
+            :license     {"MIT License" "https://opensource.org/licenses/MIT"}}
+ test-cljs {:cljs-opts {:process-shim false}})
 
 (l/bootlaces! version :dont-modify-paths? true)
 

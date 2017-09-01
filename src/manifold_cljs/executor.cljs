@@ -17,8 +17,10 @@
     (execute [_ f]
       (js/setTimeout f timeout-ms))))
 
+(defn- node? [] (= cljs.core/*target* "nodejs"))
+
 (def ^:private next-tick-executor-instance
-  (if (exists? js/process)
+  (if (node?)
     (reify Executor
       (execute [_ f]
         (.nextTick js/process f)))
