@@ -2,16 +2,16 @@
 (def version "0.1.7-2-SNAPSHOT")
 
 (set-env! :resource-paths #{"src" "vendor"}
-          :dependencies   '[[org.clojure/clojure "1.8.0" :scope "provided"]
-                            [org.clojure/clojurescript "1.9.908" :scope "provided"]
-                            [adzerk/boot-cljs "2.0.0" :scope "test"
+          :dependencies   '[[org.clojure/clojure "1.9.0" :scope "provided"]
+                            [org.clojure/clojurescript "1.10.238" :scope "provided"]
+                            [adzerk/boot-cljs "2.1.4" :scope "test"
                              :exclusions [org.clojure/clojurescript]]
-                            [adzerk/boot-test "1.1.2" :scope "test"]
-                            [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
+                            [adzerk/boot-test "1.2.0" :scope "test"]
+                            [crisptrutski/boot-cljs-test "0.3.4" :scope "test"]
                             [adzerk/bootlaces "0.1.13" :scope "test"]
 
-                            [adzerk/boot-reload "0.5.1" :scope "test"]
-                            [pandeiro/boot-http "0.7.3" :scope "test"]])
+                            [adzerk/boot-reload "0.5.2" :scope "test"]
+                            [pandeiro/boot-http "0.8.3" :scope "test"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[adzerk.bootlaces :as l :refer [push-release]]
@@ -71,7 +71,7 @@
   (dev!)
   (set-env! :resource-paths #{"examples/src"})
   (merge-env! :dependencies `[[~project ~version]
-                              [org.clojure/core.async "0.2.395"]])
+                              [org.clojure/core.async "0.4.474"]])
   (comp
     (http/serve :httpkit true, :port 3000)
     (watch)
