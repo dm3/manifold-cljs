@@ -21,7 +21,7 @@ Manifold functions had to go.
 Add the following dependency to your project.clj or build.boot:
 
 ```clojure
-[manifold-cljs "0.1.7-0"]
+[manifold-cljs "0.1.7-1"]
 ```
 
 Then use it in your project:
